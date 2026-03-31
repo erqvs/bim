@@ -121,6 +121,48 @@
       "uploadHint": "Please do not close the dialog until upload finished.",
       "value": "Model"
     },
+    "ifc": {
+      "action": "Upload IFC",
+      "modalTitle": "Upload IFC model",
+      "uploadText": "Upload IFC file",
+      "uploadHint": "After upload, the model can be viewed online and queried for coordinates.",
+      "uploadSuccess": "IFC uploaded successfully."
+    },
+    "rvt": {
+      "action": "RVT Convert",
+      "value": "RVT Convert",
+      "modalTitle": "Upload RVT and submit translation",
+      "uploadText": "Upload RVT file",
+      "uploadHint": "The file will be submitted to APS automatically after upload.",
+      "submitSuccess": "RVT uploaded and translation submitted.",
+      "fileLabel": "Source",
+      "progressLabel": "Progress",
+      "messageLabel": "Message",
+      "status": {
+        "not_started": "Not started",
+        "uploaded": "Uploaded",
+        "submitting": "Submitting",
+        "in_progress": "In progress",
+        "success": "Completed",
+        "failed": "Failed"
+      }
+    },
+    "viewer": {
+      "empty": "No model available.",
+      "unsupported": "This model type is not supported in the web viewer.",
+      "loading": "Loading IFC...",
+      "error": "Failed to load IFC.",
+      "selection": "Element Info",
+      "selectionHint": "Click an element in the model to inspect metadata and XYZ coordinates.",
+      "modelName": "Model",
+      "modelId": "Model ID",
+      "elementId": "Element ID",
+      "name": "Name",
+      "globalId": "GlobalId",
+      "type": "Type",
+      "clickPoint": "Click XYZ",
+      "centerPoint": "Center XYZ"
+    },
     "edit": {
       "tag": {
         "placeholder": "You can input tags."

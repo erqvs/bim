@@ -21,7 +21,9 @@
     "react-infinite-scroller": "^1.2.4",
     "react-load-script": "0.0.6",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "three": "^0.135.0",
+    "web-ifc-viewer": "^1.0.218"
   },
   "scripts": {
     "start": "react-scripts start",

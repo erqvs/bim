@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import Script from 'react-load-script';
 import {useTranslation} from "react-i18next";
-import {Image, Modal} from "antd";
 
 export default (
     {

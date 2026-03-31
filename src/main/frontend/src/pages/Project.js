@@ -28,7 +28,7 @@ import QRCode from 'qrcode.react';
 import TagSelect from '../components/TagSelect';
 import UserSelect from '../components/UserSelect';
 import ProjectDelete from '../components/ProjectDelete';
-import BimViewer from "../components/BimViewer";
+import ModelViewer from "../components/ModelViewer";
 
 
 const Project = ({id, project, refresh}) => {
@@ -63,10 +63,45 @@ const Project = ({id, project, refresh}) => {
         setOwnersAndUpdate = useCallback((owners) => {
             setOwners(owners);
             update({owners});
-        }, [setOwners, update]);
+        }, [setOwners, update]),
+        showIfcUploadModal = useCallback(() => {
+            let modal;
+            modal = Modal.info({
+                title: t('project.ifc.modalTitle'),
+                okText: t('project.model.close'),
+                width: 560,
+                content: <Upload.Dragger
+                    accept=".ifc"
+                    maxCount={1}
+                    customRequest={({file, onError, onProgress, onSuccess}) => {
+                        const form = new FormData();
+                        form.append('file', file);
+                        axios.post(`/bim-project/ifc/${id}/upload`, form, {
+                            headers: {"Content-Type": "multipart/form-data"},
+                            onUploadProgress: event => {
+                                if (event.total) {
+                                    onProgress({percent: Math.round(event.loaded / event.total * 100)}, file);
+                                }
+                            }
+                        }).then(result => {
+                            message.success(t('project.ifc.uploadSuccess'));
+                            onSuccess(result, file);
+                            modal && modal.destroy();
+                            refresh();
+                        }).catch(error => onError(error));
+                    }}
+                >
+                    <p className="ant-upload-drag-icon">
+                        <InboxOutlined/>
+                    </p>
+                    <p className="ant-upload-text">{t('project.ifc.uploadText')}</p>
+                    <p className="ant-upload-hint">{t('project.ifc.uploadHint')}</p>
+                </Upload.Dragger>
+            });
+        }, [id, refresh, t]);
     return (
         <div style={{height: '100%'}}>
-            <BimViewer style={{width: '100%', height: '70%'}} models={models} screenShot={blobUrl => {
+            <ModelViewer style={{width: '100%', height: '70%'}} models={models} screenShot={blobUrl => {
                 Modal.confirm({
                     icon: false,
                     okText: t('project.model.screenshotOkText'),
@@ -151,7 +186,8 @@ const Project = ({id, project, refresh}) => {
                         }
                         const modal = Modal.success({icon: false, content: content(shareToken)});
                     }} icon={<ShareAltOutlined/>}>{t('project.share.value')}</Button>,
-                    <ProjectDelete key={2} id={id} onSuccess={() => history.push('/bim')} icon={false}/>
+                    <Button key={2} onClick={showIfcUploadModal} icon={<UploadOutlined/>}>{t('project.ifc.action')}</Button>,
+                    <ProjectDelete key={3} id={id} onSuccess={() => history.push('/bim')} icon={false}/>
                 ]}
             >
                 <Descriptions size="small" column={3}>
@@ -205,13 +241,13 @@ const Project = ({id, project, refresh}) => {
                     >
                         {models && models.map(m => <Dropdown key={m.name} overlay={<Menu>
                             <Menu.Item key="1" onClick={
-                                () => axios.post(`/bim-project/svf/${id}/${m.name}/setMainModel`).then(() => refresh())
+                                () => axios.post(`/bim-project/${m.type || 'svf'}/${id}/${m.name}/setMainModel`).then(() => refresh())
                             }>{t('project.model.setMainModel')}</Menu.Item>
                         </Menu>} trigger={['contextMenu']}>
                             <Tag closable
-                                 onClose={() => axios.delete(`/bim-project/svf/${id}/${m.name}`).then(() => refresh())}
+                                 onClose={() => axios.delete(`/bim-project/${m.type || 'svf'}/${id}/${m.name}`).then(() => refresh())}
                                  icon={<ProjectOutlined/>}
-                            >{m.name}</Tag>
+                            >{m.name} ({(m.type || 'svf').toUpperCase()})</Tag>
                         </Dropdown>)}
                     </Descriptions.Item>
                 </Descriptions>

@@ -1,6 +1,8 @@
 package com.zjjqtech.bimplatform.controller;
 
 import com.zjjqtech.bimplatform.controller.utils.Result;
+import com.zjjqtech.bimplatform.infrastructure.exception.BizException;
+import com.zjjqtech.bimplatform.model.BimModel;
 import com.zjjqtech.bimplatform.model.BimProject;
 import com.zjjqtech.bimplatform.model.BimProjectAbbr;
 import com.zjjqtech.bimplatform.model.FileUploadArgs;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
@@ -23,6 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author zao
@@ -117,6 +121,20 @@ public class BimProjectController {
     @DeleteMapping("/{type}/{id}/{modelName}")
     public void deleteModel(@PathVariable String type, @PathVariable String id, @PathVariable String modelName) {
         bimProjectService.deleteModel(type, id, modelName);
+    }
+
+    @SneakyThrows
+    @PreAuthorize("hasRole('ADMIN') || @bimProjectService.checkIsOwnerOfBimProject(#id)")
+    @PostMapping("/ifc/{id}/upload")
+    public BimModel uploadIfc(@PathVariable String id, @RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new BizException("validate.error.ifc.file.required");
+        }
+        String originalFilename = file.getOriginalFilename();
+        if (!StringUtils.hasText(originalFilename) || !originalFilename.toLowerCase(Locale.ROOT).endsWith(".ifc")) {
+            throw new BizException("validate.error.ifc.file.type");
+        }
+        return bimProjectService.uploadModel("/bim-project", "ifc", id, originalFilename, file.getInputStream(), file.getSize(), file.getContentType());
     }
 
     @SneakyThrows

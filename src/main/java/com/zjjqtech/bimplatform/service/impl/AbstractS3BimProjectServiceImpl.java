@@ -26,6 +26,8 @@ public abstract class AbstractS3BimProjectServiceImpl extends AbstractBimProject
 
     protected abstract FileUploadArgs buildModelFileUploadArgs(String type, String bimProjectId, String modelName, String fileName, String contentType);
 
+    protected abstract void uploadModelFile(String objectName, InputStream inputStream, long size, String contentType);
+
     protected abstract String generateCover(String path, String type, String id, String name, InputStream inputStream, long size, String contentType);
 
     @Value("${s3.expired-seconds}")
@@ -72,6 +74,36 @@ public abstract class AbstractS3BimProjectServiceImpl extends AbstractBimProject
                 bimProjectRepository.save(bimProject);
             }
             return fileUploadArgs;
+        } else {
+            throw new BizException("validate.error.bim-project.non-existed");
+        }
+    }
+
+    @Override
+    public BimModel uploadModel(String path, String type, String bimProjectId, String sourceFileName, InputStream inputStream, long size, String contentType) {
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = "application/octet-stream";
+        }
+        String fileName = normalizeFileName(sourceFileName);
+        String modelName = resolveModelName(fileName);
+        Optional<BimProject> bimProjectHolder = bimProjectRepository.findById(bimProjectId);
+        if (bimProjectHolder.isPresent()) {
+            BimProject bimProject = bimProjectHolder.get();
+            List<BimModel> models = bimProject.getModels();
+            Optional<BimModel> modelHolder = models.stream().filter(m -> modelName.equals(m.getName())).findFirst();
+            modelHolder.map(BimModel::getPrefix).filter(StringUtils::hasText).ifPresent(this::deleteModelFiles);
+            uploadModelFile(generateObjectName(type, bimProjectId, modelName, fileName), inputStream, size, contentType);
+            BimModel model = modelHolder.orElseGet(() -> {
+                BimModel bimModel = new BimModel();
+                models.add(bimModel);
+                return bimModel;
+            });
+            model.setType(type);
+            model.setName(modelName);
+            model.setPrefix(generatePrefix(type, bimProjectId, modelName));
+            model.setMainPath(generateMainPath(path, type, bimProjectId, modelName, fileName));
+            bimProjectRepository.save(bimProject);
+            return model;
         } else {
             throw new BizException("validate.error.bim-project.non-existed");
         }
@@ -173,5 +205,16 @@ public abstract class AbstractS3BimProjectServiceImpl extends AbstractBimProject
         return String.join("/", path, generateObjectName(type, bimProjectId, modelName, mainFile));
     }
 
+    protected String normalizeFileName(String sourceFileName) {
+        String normalized = sourceFileName == null ? "" : sourceFileName.replace('\\', '/');
+        int separatorIndex = normalized.lastIndexOf('/');
+        return separatorIndex > -1 ? normalized.substring(separatorIndex + 1) : normalized;
+    }
+
+    protected String resolveModelName(String fileName) {
+        int extensionIndex = fileName.lastIndexOf('.');
+        String modelName = extensionIndex > 0 ? fileName.substring(0, extensionIndex) : fileName;
+        return StringUtils.hasText(modelName) ? modelName : "model";
+    }
 
 }

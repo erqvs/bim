@@ -2,6 +2,7 @@ package com.zjjqtech.bimplatform.service.impl;
 
 import com.zjjqtech.bimplatform.service.MailService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -30,15 +31,19 @@ public class MailServiceImpl implements MailService {
     private final TemplateEngine templateEngine;
     private final JavaMailSender javaMailSender;
 
-    public MailServiceImpl(SpringTemplateEngine templateEngine, MessageSource messageSource, JavaMailSender javaMailSender) {
+    public MailServiceImpl(SpringTemplateEngine templateEngine, MessageSource messageSource, ObjectProvider<JavaMailSender> javaMailSenderProvider) {
         templateEngine.setMessageSource(messageSource);
         this.templateEngine = templateEngine;
-        this.javaMailSender = javaMailSender;
+        this.javaMailSender = javaMailSenderProvider.getIfAvailable();
     }
 
     @Override
     @Async
     public void send(String templateId, String to, Map<String, Object> variables, Locale locale) throws MessagingException {
+        if (javaMailSender == null) {
+            log.warn("Mail sender is not configured. Skip sending template [{}] to [{}].", templateId, to);
+            return;
+        }
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
         messageHelper.setFrom($env("spring.mail.username"));

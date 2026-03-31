@@ -64,6 +64,13 @@ public class MinioBimProjectServiceImpl extends AbstractS3BimProjectServiceImpl 
 
     @SneakyThrows
     @Override
+    protected void uploadModelFile(String objectName, InputStream inputStream, long size, String contentType) {
+        this.minio.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName).contentType(contentType)
+                .stream(inputStream, size, -1).build());
+    }
+
+    @SneakyThrows
+    @Override
     protected void deleteModelFiles(String prefix) {
         List<DeleteObject> objects = new ArrayList<>();
         for (Result<Item> result : this.minio

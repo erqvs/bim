@@ -1,5 +1,6 @@
 package com.zjjqtech.bimplatform.service;
 
+import com.zjjqtech.bimplatform.model.BimModel;
 import com.zjjqtech.bimplatform.model.BimProject;
 import com.zjjqtech.bimplatform.model.BimProjectAbbr;
 import com.zjjqtech.bimplatform.model.FileUploadArgs;
@@ -150,6 +151,20 @@ public interface BimProjectService {
      * @return inputStream
      */
     ResponseEntity<InputStreamResource> getFileResource(String type, String bimProjectId, String modelName, String mainFile);
+
+    /**
+     * upload single file model
+     *
+     * @param path           path
+     * @param type           type
+     * @param id             id
+     * @param sourceFileName sourceFileName
+     * @param inputStream    inputStream
+     * @param size           size
+     * @param contentType    contentType
+     * @return bimModel
+     */
+    BimModel uploadModel(String path, String type, String id, String sourceFileName, InputStream inputStream, long size, String contentType);
 
     /**
      * setCover

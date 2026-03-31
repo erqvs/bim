@@ -2,6 +2,10 @@ spring:
   thymeleaf:
     prefix: classpath:/static/
     cache: false
+  servlet:
+    multipart:
+      max-file-size: 256MB
+      max-request-size: 256MB
   session:
     store-type: jdbc
   jpa:
@@ -83,6 +87,14 @@ jwt:
 swagger:
   enabled: false
   base-package: com.zjjqtech.bimplatform
+
+aps:
+  enabled: ${APS_ENABLED:false}
+  client-id: ${APS_CLIENT_ID:}
+  client-secret: ${APS_CLIENT_SECRET:}
+  region: ${APS_REGION:US}
+  bucket-prefix: ${APS_BUCKET_PREFIX:my-bim}
+  bucket-policy: ${APS_BUCKET_POLICY:transient}
 
 ---
 spring.profiles: debug

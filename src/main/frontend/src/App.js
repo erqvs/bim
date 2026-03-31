@@ -18,7 +18,7 @@ import {ConfigProvider, Row, Spin} from 'antd';
 import zh from 'antd/es/locale/zh_CN';
 import en from 'antd/es/locale/en_US';
 import axios from "./axios";
-import BimViewer from "./components/BimViewer";
+import ModelViewer from "./components/ModelViewer";
 import qs from "qs";
 
 
@@ -57,8 +57,10 @@ export default () => {
                             if (shareToken) {
                                 setModels(models.map(m => {
                                     const index = m.mainPath.indexOf('/bim-project/');
-                                    m.mainPath = `${m.mainPath.substring(0, index + 13)}share/${shareToken}/${m.mainPath.substring(index + 13)}`;
-                                    return {...m};
+                                    return {
+                                        ...m,
+                                        mainPath: `${m.mainPath.substring(0, index + 13)}share/${shareToken}/${m.mainPath.substring(index + 13)}`
+                                    };
                                 }));
                             } else {
                                 setModels(models);
@@ -66,7 +68,7 @@ export default () => {
                         });
                     }, [id, shareToken]);
                     return (models.length > 0 &&
-                        <BimViewer style={{width: '100%', height: '100vh'}} models={models} />) ||
+                        <ModelViewer style={{width: '100%', height: '100vh'}} models={models}/>) ||
                         <Row align={"middle"} justify={"center"} style={{height: '100vh', width: '100%'}}>
                             <Spin size={"large"} tip={t('loading')}/>
                         </Row>;

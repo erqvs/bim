@@ -128,6 +128,48 @@
       "uploadText": "上传svf模型文件夹",
       "uploadHint": "上传完成前请勿关闭对话框",
       "value": "模型"
+    },
+    "ifc": {
+      "action": "上传IFC",
+      "modalTitle": "上传IFC模型",
+      "uploadText": "上传IFC文件",
+      "uploadHint": "上传后可直接在线查看并点选构件查看坐标.",
+      "uploadSuccess": "IFC上传成功."
+    },
+    "rvt": {
+      "action": "RVT转换",
+      "value": "RVT转换",
+      "modalTitle": "上传RVT并提交转换",
+      "uploadText": "上传RVT文件",
+      "uploadHint": "上传完成后会自动提交到APS开始转换.",
+      "submitSuccess": "RVT已上传并提交转换.",
+      "fileLabel": "源文件",
+      "progressLabel": "进度",
+      "messageLabel": "说明",
+      "status": {
+        "not_started": "未开始",
+        "uploaded": "已上传",
+        "submitting": "提交中",
+        "in_progress": "转换中",
+        "success": "转换完成",
+        "failed": "转换失败"
+      }
+    },
+    "viewer": {
+      "empty": "暂无可查看模型",
+      "unsupported": "当前模型类型暂不支持在线查看",
+      "loading": "IFC加载中...",
+      "error": "IFC加载失败",
+      "selection": "构件信息",
+      "selectionHint": "单击模型中的构件，可查看名称、编号和XYZ坐标.",
+      "modelName": "模型",
+      "modelId": "模型ID",
+      "elementId": "构件ID",
+      "name": "名称",
+      "globalId": "GlobalId",
+      "type": "类型",
+      "clickPoint": "点击点 XYZ",
+      "centerPoint": "构件中心 XYZ"
     }
   }
 }
